@@ -6,9 +6,13 @@ if ! command -v smartctl >/dev/null ; then
 	apt install smartctl
 fi
 
+if [ ! -d "logs" ]; then
+    mkdir logs
+fi
+
 date=$(date)
-echo "-----------------------------------------------------" >> smartvalue.txt
-echo "${date}" >> smartvalue.txt
+echo "-----------------------------------------------------" >> "logs/smartvalue - ${date}.txt"
+echo "${date}" > "logs/smartvalue - ${date}.txt"
 
 for drive in /dev/sd[a-z] /dev/sd[a-z][a-z]
 do
@@ -24,17 +28,19 @@ cps=$(smartctl -a $drive 2>/dev/null | grep Current_Pending_Sector | awk '{ prin
 ou=$(smartctl -a $drive 2>/dev/null | grep Offline_Uncorrectable | awk '{ print $10 }')
 smarthealth=$(smartctl -H $drive 2>/dev/null | grep '^SMART overall' | awk '{ print $6 }')
 
-echo "" >> smartvalue.txt
-echo "drive=${drive}" >> smartvalue.txt
-echo "status=${smarthealth}" >> smartvalue.txt
-echo "" >> smartvalue.txt
-echo "S.M.A.R.T:" >> smartvalue.txt
-echo "Reallocated_Sector_Ct(5)=${rsc}" >> smartvalue.txt
-echo "Reported_Uncorrect(187)=${ru}" >> smartvalue.txt
-echo "Command_Timeout(188)=${ct}" >> smartvalue.txt
-echo "Current_Pending_Sector(197)=${cps}" >> smartvalue.txt
-echo "Offline_Uncorrectable(198)=${ou}" >> smartvalue.txt
-echo "" >> smartvalue.txt
+# smartvalue log
+
+echo "" > "logs/smartvalue - ${date}.txt"
+echo "drive=${drive}" > "logs/smartvalue - ${date}.txt"
+echo "status=${smarthealth}" > "logs/smartvalue - ${date}.txt"
+echo "" > "logs/smartvalue - ${date}.txt"
+echo "S.M.A.R.T:" > "logs/smartvalue - ${date}.txt"
+echo "Reallocated_Sector_Ct(5)=${rsc}" > "logs/smartvalue - ${date}.txt"
+echo "Reported_Uncorrect(187)=${ru}" > "logs/smartvalue - ${date}.txt"
+echo "Command_Timeout(188)=${ct}" > "logs/smartvalue - ${date}.txt"
+echo "Current_Pending_Sector(197)=${cps}" > "logs/smartvalue - ${date}.txt"
+echo "Offline_Uncorrectable(198)=${ou}" > "logs/smartvalue - ${date}.txt"
+echo "" > "logs/smartvalue - ${date}.txt"
 
 echo "$smarthealth"
 

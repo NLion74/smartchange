@@ -1,2 +1,2 @@
 # smartchange
-A script to track drive failure and smart values indicating drive failure
+A script to track drive failure and changes in smart values indicating drive failure

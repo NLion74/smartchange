@@ -21,7 +21,6 @@ fi
 
 Folder='smartcheck/'
 Workingdir=$HOME/
-exec 3>&1 4>&2 >>"${Workingdir}${Folder}logs.txt" 2>&1
 
 # Getting latest Smartvaluelog
 unset -v latest

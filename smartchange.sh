@@ -9,26 +9,31 @@ if ! command -v smartctl >/dev/null ; then
 fi
 
 # Looking for existing logs and changes directory
-
-if [ ! -d "logs" ]; then
-    mkdir logs
+if [ ! -d "${Workingdir}${Folder}logs" ]; then
+    /bin/mkdir ${Workingdir}${Folder}logs
 fi
 
-if [ ! -d "changes" ]; then
-    mkdir changes
+if [ ! -d "${Workingdir}${Folder}changes" ]; then
+    /bin/mkdir ${Workingdir}${Folder}changes
 fi
+
+# Folder Variables
+
+Folder='smartcheck/'
+Workingdir=$HOME/
+exec 3>&1 4>&2 >>"${Workingdir}${Folder}logs.txt" 2>&1
 
 # Getting latest Smartvaluelog
 unset -v latest
-for file in "logs"/*; do
+for file in "${Workingdir}${Folder}logs"/*; do
   [[ $file -nt $latest ]] && latest=$file
 done
 
 # Initiating Smartvaluelog
 
 date=$(date)
-echo "-----------------------------------------------------" >> "logs/smartvalue - ${date}.txt"
-echo "${date}" >> "logs/smartvalue - ${date}.txt"
+echo "-----------------------------------------------------" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "${date}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
 
 # Detecting Drives
 
@@ -46,34 +51,35 @@ changeru=$(grep -A 8 "$drive" "$file" 2>/dev/null | grep Reported_Uncorrect |  c
 changect=$(grep -A 8 "$drive" "$file" 2>/dev/null | grep Command_Timeout |  cut -d "=" -f2)
 changecps=$(grep -A 8 "$drive" "$file" 2>/dev/null | grep Current_Pending_Sector |  cut -d "=" -f2)
 changeou=$(grep -A 8 "$drive" "$file" 2>/dev/null | grep Offline_Uncorrectable |  cut -d "=" -f2)
-rsc=$(smartctl -a "$drive" 2>/dev/null | grep Reallocated_Sector_Ct | awk '{ print $10 }')
-ru=$(smartctl -a "$drive" 2>/dev/null | grep Reported_Uncorrect | awk '{ print $10 }')
-ct=$(smartctl -a "$drive" 2>/dev/null | grep Command_Timeout | awk '{ print $10 " " $11 " " $12 }')
-cps=$(smartctl -a "$drive" 2>/dev/null | grep Current_Pending_Sector | awk '{ print $10 }')
-ou=$(smartctl -a "$drive" 2>/dev/null | grep Offline_Uncorrectable | awk '{ print $10 }')
+rsc=$(/bin/bash -c '/usr/sbin/smartctl -a '$drive'' | grep Reallocated_Sector_Ct | awk '{ print $10 }')
+ru=$(/bin/bash -c '/usr/sbin/smartctl -a '$drive'' | grep Reported_Uncorrect | awk '{ print $10 }')
+ct=$(/bin/bash -c '/usr/sbin/smartctl -a '$drive'' | grep Command_Timeout | awk '{ print $10 " " $11 " " $12 }')
+cps=$(/bin/bash -c '/usr/sbin/smartctl -a '$drive'' | grep Current_Pending_Sector | awk '{ print $10 }')
+ou=$(/bin/bash -c '/usr/sbin/smartctl -a '$drive'' | grep Offline_Uncorrectable | awk '{ print $10 }')
 smarthealth=$(smartctl -H "$drive" 2>/dev/null | grep '^SMART overall' | awk '{ print $6 }')
 
 # Creating Changelog
 
-if [[ $rsc == '' || $changersc == '' ]]; then true; elif [ "$rsc" != "$changersc" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$rsc --> $changersc" >> "changes/smartchangelog - ${date}.txt"; fi
-if [[ $ru == '' || $changeru == '' ]]; then true; elif [ "$ru" != "$changeru" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$ru --> $changeru" >> "changes/smartchangelog - ${date}.txt"; fi
-if [[ $ct == '' || $changect == '' ]]; then true; elif [ "$ct" != "$changect" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$ct --> $changect" >> "changes/smartchangelog - ${date}.txt"; fi
-if [[ $cps == '' || $changecps == '' ]]; then true; elif [ "$cps" != "$changecps" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$cps --> $changecps" >> "changes/smartchangelog - ${date}.txt"; fi
-if [[ $ou == '' || $changeou == '' ]]; then true; elif [ "$ou" != "$changeou" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$ou --> $changeou" >> "changes/smartchangelog - ${date}.txt"; fi
+if [[ $rsc == '' || $changersc == '' ]]; then true; elif [ "$rsc" != "$changersc" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$rsc --> $changersc" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $ru == '' || $changeru == '' ]]; then true; elif [ "$ru" != "$changeru" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$ru --> $changeru" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $ct == '' || $changect == '' ]]; then true; elif [ "$ct" != "$changect" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$ct --> $changect" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $cps == '' || $changecps == '' ]]; then true; elif [ "$cps" != "$changecps" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$cps --> $changecps" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $ou == '' || $changeou == '' ]]; then true; elif [ "$ou" != "$changeou" ]; then echo "$date | $drive | Reallocated_Sector_Ct=$ou --> $changeou" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
 
 # Creating Smartvaluelog
 
-echo "" >> "logs/smartvalue - ${date}.txt"
-echo "drive=${drive}" >> "logs/smartvalue - ${date}.txt"
-echo "status=${smarthealth}" >> "logs/smartvalue - ${date}.txt"
-echo "" >> "logs/smartvalue - ${date}.txt"
-echo "S.M.A.R.T:" >> "logs/smartvalue - ${date}.txt"
-echo "Reallocated_Sector_Ct(5)=${rsc}" >> "logs/smartvalue - ${date}.txt"
-echo "Reported_Uncorrect(187)=${ru}" >> "logs/smartvalue - ${date}.txt"
-echo "Command_Timeout(188)=${ct}" >> "logs/smartvalue - ${date}.txt"
-echo "Current_Pending_Sector(197)=${cps}" >> "logs/smartvalue - ${date}.txt"
-echo "Offline_Uncorrectable(198)=${ou}" >> "logs/smartvalue - ${date}.txt"
-echo "" >> "logs/smartvalue - ${date}.txt"
+
+echo "" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "drive=${drive}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "status=${smarthealth}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "S.M.A.R.T:" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "Reallocated_Sector_Ct(5)=${rsc}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "Reported_Uncorrect(187)=${ru}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "Command_Timeout(188)=${ct}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "Current_Pending_Sector(197)=${cps}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "Offline_Uncorrectable(198)=${ou}" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
+echo "" >> "${Workingdir}${Folder}logs/smartvalue - ${date}.txt"
 
 # Printing Smarthealthcheck Result
 

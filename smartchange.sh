@@ -59,11 +59,11 @@ smarthealth=$(smartctl -H "$drive" 2>/dev/null | grep '^SMART overall' | awk '{ 
 
 # Creating Changelog
 
-if [[ $rsc == '' || $changersc == '' ]]; then true; elif [ "$rsc" != "$changersc" ]; then echo "$date | $drive | Reallocated_Sector_Ct(5)=${rsc} --> $changersc" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
-if [[ $ru == '' || $changeru == '' ]]; then true; elif [ "$ru" != "$changeru" ]; then echo "$date | $drive | Reported_Uncorrect(187)=${ru} --> $changeru" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
-if [[ $ct == '' || $changect == '' ]]; then true; elif [ "$ct" != "$changect" ]; then echo "$date | $drive | Command_Timeout(188)=${ct} --> $changect" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
-if [[ $cps == '' || $changecps == '' ]]; then true; elif [ "$cps" != "$changecps" ]; then echo "$date | $drive | Current_Pending_Sector(197)=${cps} --> $changecps" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
-if [[ $ou == '' || $changeou == '' ]]; then true; elif [ "$ou" != "$changeou" ]; then echo "$date | $drive | 198: Offline_Uncorrectable(198)=${ou} --> $changeou" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $rsc == '' || $changersc == '' ]]; then true; elif [ "$rsc" != "$changersc" ]; then echo "$date | $drive | Reallocated_Sector_Ct(5)=${changersc} --> $rsc" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $ru == '' || $changeru == '' ]]; then true; elif [ "$ru" != "$changeru" ]; then echo "$date | $drive | Reported_Uncorrect(187)=${changeru} --> $ru" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $ct == '' || $changect == '' ]]; then true; elif [ "$ct" != "$changect" ]; then echo "$date | $drive | Command_Timeout(188)=${changect} --> $ct" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $cps == '' || $changecps == '' ]]; then true; elif [ "$cps" != "$changecps" ]; then echo "$date | $drive | Current_Pending_Sector(197)=${changecps} --> $cps" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
+if [[ $ou == '' || $changeou == '' ]]; then true; elif [ "$ou" != "$changeou" ]; then echo "$date | $drive | 198: Offline_Uncorrectable(198)=${changeou} --> $ou" >> "${Workingdir}${Folder}changes/smartchangelog - ${date}.txt"; fi
 
 # Creating Smartvaluelog
 
